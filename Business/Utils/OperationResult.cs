@@ -1,8 +1,9 @@
-﻿public class OperationResult
+﻿public class OperationResult<T>
 {
     public bool Success { get; set; }
+    public T? Data { get; set; }
     public string? Message { get; set; }
 
-    public static OperationResult Ok(string message) => new() { Success = true, Message = message };
-    public static OperationResult Fail(string message) => new() { Success = false, Message = message };
+    public static OperationResult<T> Ok(T data,string message) => new() { Success = true,Data = data, Message = message };
+    public static OperationResult<T> Fail(string message) => new() { Success = false, Message = message };
 }

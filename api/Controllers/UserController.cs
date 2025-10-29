@@ -1,9 +1,10 @@
 ﻿
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 public class UserController : ControllerBase
 {
-    private readonly UserService _userService;
-    public UserController(UserService userService)
+    private readonly IUserService _userService;
+    public UserController(IUserService userService)
     {
         _userService = userService;
     }
@@ -20,13 +21,11 @@ public class UserController : ControllerBase
         return Ok(result.Message);
     }
     [HttpDelete("delete_user")]
-    public async Task<IActionResult> RemoveUser([FromBody] RemoveUserDto request)
+    public async Task<IActionResult> RemoveUser(int userId)
     {
-        if (  string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
-        {
-            return BadRequest("All fields are required.");
-        }
-            var result = await _userService.DeleteUserAsync(request.Email, request.Password);
+        if (  string.IsNullOrWhiteSpace(userId.ToString())) return BadRequest("All fields are required.");
+        
+            var result = await _userService.DeleteUserAsync( userId);
         if (!result.Success) return BadRequest(result.Message);
         
         return Ok(result.Message);
@@ -59,6 +58,7 @@ public class UserController : ControllerBase
         return Ok(result.Message);
     }
 
+    
     [HttpPost("login")]
     public async Task<IActionResult> Login(string Email, string Password)
     {
@@ -70,7 +70,11 @@ public class UserController : ControllerBase
         if (!result.Success)
             return BadRequest(result.Message);
 
-        return Ok(result.Message);
+        return Ok(new
+        {
+            Token = result.Data,
+            Message = result.Message
+        });
     }
 
 
