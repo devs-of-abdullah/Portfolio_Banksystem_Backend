@@ -7,7 +7,7 @@ public class User
     public string Email { get; set; } = string.Empty;
     public string PasswordHash { get; set; } = string.Empty;
 
-    public ICollection<Account> Accounts { get; set; } = new List<Account>();
+    public List<Account> Accounts { get; set; } = new List<Account>();
 }
 
 public class Account

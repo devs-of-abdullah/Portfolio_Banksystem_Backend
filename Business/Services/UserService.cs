@@ -153,5 +153,21 @@ public class UserService : IUserService
         }
     }
 
-    
+    public async Task<OperationResult<List<Account>>> GetUserAccountsAsync(int userId)
+    {
+        var user = await _context.Users
+            .Include(u => u.Accounts)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+
+        if (user == null)
+            return OperationResult<List<Account>>.Fail("User ID not found.");
+
+        var accounts = user.Accounts.ToList();
+
+        if (accounts.Count == 0)
+            return OperationResult<List<Account>>.Fail("This user has no accounts.");
+
+        return OperationResult<List<Account>>.Ok(accounts, "User accounts retrieved successfully.");
+    }
+
 }

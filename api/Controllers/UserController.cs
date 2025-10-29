@@ -58,7 +58,6 @@ public class UserController : ControllerBase
         return Ok(result.Message);
     }
 
-    
     [HttpPost("login")]
     public async Task<IActionResult> Login(string Email, string Password)
     {
@@ -76,6 +75,17 @@ public class UserController : ControllerBase
             Message = result.Message
         });
     }
+
+    [HttpGet("{userId}/accounts")]
+    public async Task<IActionResult> GetUserAccounts(int userId)
+    {
+        var result = await _userService.GetUserAccountsAsync(userId);
+
+        if (!result.Success)
+            return BadRequest(result.Message);
+        return Ok(result.Data);
+    }
+
 
 
 
