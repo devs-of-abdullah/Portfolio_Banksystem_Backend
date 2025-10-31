@@ -1,9 +1,6 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
-using Microsoft.IdentityModel.Tokens;
-using System.IdentityModel.Tokens.Jwt;
-using System.Security.Claims;
-using System.Text;
+
 
 public class UserService : IUserService
 {
@@ -155,19 +152,40 @@ public class UserService : IUserService
 
     public async Task<OperationResult<List<Account>>> GetUserAccountsAsync(int userId)
     {
+        try
+        {
+            var user = await _context.Users
+                .Include(u => u.Accounts)
+                .FirstOrDefaultAsync(u => u.Id == userId);
+
+            if (user == null)
+                return OperationResult<List<Account>>.Fail("User ID not found.");
+
+            var accounts = user.Accounts.ToList();
+
+            if (accounts.Count == 0)
+                return OperationResult<List<Account>>.Fail("This user has no accounts.");
+
+            return OperationResult<List<Account>>.Ok(accounts, "User accounts retrieved successfully.");
+        }
+        catch (Exception ex) { return OperationResult<List<Account>>.Fail(ex.Message); }
+    }
+
+    public async Task<OperationResult<decimal>> GetUserBalanceAsync(int userId)
+    {
         var user = await _context.Users
             .Include(u => u.Accounts)
             .FirstOrDefaultAsync(u => u.Id == userId);
 
         if (user == null)
-            return OperationResult<List<Account>>.Fail("User ID not found.");
+            return OperationResult<decimal>.Fail("User not found.");
 
-        var accounts = user.Accounts.ToList();
+        if (user.Accounts == null || user.Accounts.Count == 0)
+            return OperationResult<decimal>.Fail("User has no accounts.");
 
-        if (accounts.Count == 0)
-            return OperationResult<List<Account>>.Fail("This user has no accounts.");
+        var totalBalance = user.Accounts.Sum(a => a.Balance);
 
-        return OperationResult<List<Account>>.Ok(accounts, "User accounts retrieved successfully.");
+        return OperationResult<decimal>.Ok(totalBalance, "User total balance calculated successfully.");
     }
 
 }

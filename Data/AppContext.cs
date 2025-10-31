@@ -1,6 +1,4 @@
-﻿
-
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 
 public class AppContext : DbContext
 {
@@ -20,7 +18,7 @@ public class AppContext : DbContext
 
         modelBuilder.Entity<User>()
             .HasMany(u => u.Accounts)
-            .WithOne(a => a.User)
+            .WithOne(a => a.User) 
             .HasForeignKey(a => a.UserId)
             .OnDelete(DeleteBehavior.Cascade);
 

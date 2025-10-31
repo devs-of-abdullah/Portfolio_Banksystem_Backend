@@ -9,5 +9,7 @@
         Task<OperationResult<string>> ActivateAllAccountsAsync(int accountId);
         Task<OperationResult<string>> DeActivateAllAccountsAsync(int accountId);
         Task<OperationResult<List<Account>>> GetAllUserAccountsAsync(int userId);
+        Task<OperationResult<decimal>> GetAccountBalanceAsync(string accountNumber);
+
     }
 

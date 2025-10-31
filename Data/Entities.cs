@@ -22,7 +22,6 @@ public class Account
 
     public int UserId { get; set; }
     public User User { get; set; } = null!;
-
     public List<Transaction> Transactions { get; set; } = new List<Transaction>();
 }
 

@@ -9,13 +9,13 @@ public class UserController : ControllerBase
         _userService = userService;
     }
     [HttpPost("register_user")]
-    public async Task<IActionResult> RegisterUser([FromBody] RegisterUserDto request)
+    public async Task<IActionResult> RegisterUser(string Fullname,string Email, string Password)
     {
-        if (string.IsNullOrWhiteSpace(request.FullName) || string.IsNullOrWhiteSpace(request.Email) || string.IsNullOrWhiteSpace(request.Password))
+        if (string.IsNullOrWhiteSpace(Fullname) || string.IsNullOrWhiteSpace(Email) || string.IsNullOrWhiteSpace(Password))
         {
             return BadRequest("All fields are required.");
         }
-        var result = await _userService.AddUserAsync(request.FullName, request.Email, request.Password);
+        var result = await _userService.AddUserAsync(Fullname,Email,Password);
 
         if (!result.Success)  return BadRequest(result.Message);
         return Ok(result.Message);
@@ -86,7 +86,13 @@ public class UserController : ControllerBase
         return Ok(result.Data);
     }
 
-
+    [HttpGet("{userId}/balance")]
+    public async Task<IActionResult> GetUserBalance(int userId)
+    {
+        var result = await _userService.GetUserBalanceAsync(userId);
+        if(!result.Success) return BadRequest(result.Message);
+        return Ok(result.Data);
+    }
 
 
 
