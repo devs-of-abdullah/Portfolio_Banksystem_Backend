@@ -8,12 +8,10 @@ var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
 
-
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection");
 
 if (string.IsNullOrWhiteSpace(connectionString))
 {
-  
     connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
                        ?? Environment.GetEnvironmentVariable("BANK_DB_CONNECTION");
 }
@@ -28,13 +26,12 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAccountService, AccountService>();
 builder.Services.AddScoped<ITransactionService, TransactionService>();
 
-// jwt begin
 var jwtKey = Environment.GetEnvironmentVariable("JWT_KEY")
              ?? builder.Configuration["Jwt:Key"];
 var jwtIssuer = Environment.GetEnvironmentVariable("JWT_ISSUER")
                ?? builder.Configuration["Jwt:Issuer"];
 var jwtAudience = Environment.GetEnvironmentVariable("JWT_AUDIENCE")
-                 ?? builder.Configuration["Jwt:Audience"];      
+                 ?? builder.Configuration["Jwt:Audience"];
 
 if (string.IsNullOrEmpty(jwtKey) || string.IsNullOrEmpty(jwtIssuer))
     throw new InvalidOperationException("JWT configuration is missing.");
@@ -57,10 +54,20 @@ builder.Services.AddAuthentication(options =>
         IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(jwtKey))
     };
 });
-// jwt end
 
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
+
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("AllowAll",
+        policy =>
+        {
+            policy.AllowAnyOrigin()
+                  .AllowAnyHeader()
+                  .AllowAnyMethod();
+        });
+});
 
 var app = builder.Build();
 
@@ -89,7 +96,11 @@ using (var scope = app.Services.CreateScope())
 }
 
 app.UseHttpsRedirection();
+
+app.UseCors("AllowAll");
 app.UseAuthentication();
 app.UseAuthorization();
+
 app.MapControllers();
+
 app.Run();
