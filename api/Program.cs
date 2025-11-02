@@ -11,7 +11,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
                        ?? Environment.GetEnvironmentVariable("BANK_DB_CONNECTION");
 
 builder.Services.AddDbContext<AppContext>(options =>
-    options.UseSqlServer(connectionString));
+    options.UseNpgsql(connectionString));
 
 
 builder.Services.AddScoped<IUserService, UserService>();
