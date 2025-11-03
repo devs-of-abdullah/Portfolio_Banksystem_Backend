@@ -11,7 +11,7 @@ public class TransactionService : ITransactionService
         _context = context;
     }
 
-    public async Task<OperationResult<bool>> TransferToAccountAsync(string senderAccountNumber, string receiverAccountNumber, int amount)
+    public async Task<OperationResult<bool>> TransferToAccountAsync(string senderAccountNumber, string receiverAccountNumber, decimal amount)
     {
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
@@ -49,7 +49,7 @@ public class TransactionService : ITransactionService
         }
     }
 
-    public async Task<OperationResult<bool>> DepositToAccountAsync(string accountNumber, int amount)
+    public async Task<OperationResult<bool>> DepositToAccountAsync(string accountNumber, decimal amount)
     {
         try
         {
@@ -84,7 +84,7 @@ public class TransactionService : ITransactionService
         }
     }
 
-    public async Task<OperationResult<bool>> WithdrawFromAccountAsync(string accountNumber, int amount)
+    public async Task<OperationResult<bool>> WithdrawFromAccountAsync(string accountNumber, decimal amount)
     {
         try
         {
