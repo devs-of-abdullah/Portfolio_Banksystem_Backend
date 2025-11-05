@@ -96,5 +96,12 @@ public class UserController : ControllerBase
         if (!result.Success) return BadRequest(result.Message);
         return Ok(result.Data);
     }
+    [HttpGet("{email}/id")]
+    public async Task<IActionResult> GetUserIdByEmail(string email)
+    {
+        var result = await _userService.GetUserIdByEmail(email);
+        if (!result.Success) return BadRequest(result.Message);
+        return Ok(result.Data);
+    }
 }
 

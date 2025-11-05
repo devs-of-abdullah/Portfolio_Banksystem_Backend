@@ -85,7 +85,22 @@ public class UserService : IUserService
             return OperationResult<string>.Fail($"Error updating email: {ex.Message}");
         }
     }
+    public async Task<OperationResult<int>> GetUserIdByEmail(string email)
+    {
+        try
+        {
+          string formatedEmail = email.Trim().ToLower();
+           var user =await _context.Users.FirstOrDefaultAsync(u => u.Email == formatedEmail);
+            if(user == null)
+                return OperationResult<int>.Fail("User not found");
+            return OperationResult<int>.Ok(user.Id, "id found");
 
+        }
+        catch (Exception ex) {
+            return OperationResult<int>.Fail($"Error while getting user id by email ({ex.Message}) ");
+        }
+
+    }
  
     public async Task<OperationResult<string>> UpdateUserFullNameAsync(int userId, string newFullName)
     {

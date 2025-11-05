@@ -9,4 +9,5 @@ public interface IUserService
     Task<OperationResult<string>> UpdateUserPasswordAsync(int userId, string newPassword);
     Task<OperationResult<List<Account>>> GetUserAccountsAsync(int userId);
     Task<OperationResult<decimal>> GetUserBalanceAsync(int userId);
+    Task<OperationResult<int>> GetUserIdByEmail(string email);
 }
