@@ -61,7 +61,7 @@ public class UserService : IUserService
     }
 
 
-    public async Task<OperationResult<string>> UpdateUserEmailAsync(int userId, string newEmail)
+    public async Task<OperationResult<User>> UpdateUserEmailAsync(int userId, string newEmail)
     {
         try
         {
@@ -69,20 +69,20 @@ public class UserService : IUserService
             var user = await _context.Users.FindAsync(userId);
 
             if (user == null)
-                return OperationResult<string>.Fail("User not found");
+                return OperationResult<User>.Fail("User not found");
 
             bool emailExists = await _context.Users.AnyAsync(u => u.Email == newEmail && u.Id != user.Id);
             if (emailExists)
-                return OperationResult<string>.Fail($"Email '{newEmail}' already exists");
+                return OperationResult<User>.Fail($"Email '{newEmail}' already exists");
 
             user.Email = newEmail;
             await _context.SaveChangesAsync();
 
-            return OperationResult<string>.Ok("", "Email updated successfully");
+            return OperationResult<User>.Ok(user, "Email updated successfully");
         }
         catch (Exception ex)
         {
-            return OperationResult<string>.Fail($"Error updating email: {ex.Message}");
+            return OperationResult<User>.Fail($"Error updating email: {ex.Message}");
         }
     }
     public async Task<OperationResult<int>> GetUserIdByEmail(string email)
@@ -101,47 +101,46 @@ public class UserService : IUserService
         }
 
     }
- 
-    public async Task<OperationResult<string>> UpdateUserFullNameAsync(int userId, string newFullName)
+
+
+    public async Task<OperationResult<User>> UpdateUserPasswordAsync(int userId, string newPassword)
     {
         try
         {
             var user = await _context.Users.FindAsync(userId);
             if (user == null)
-                return OperationResult<string>.Fail("User not found");
-
-            user.FullName = newFullName;
-            await _context.SaveChangesAsync();
-
-            return OperationResult<string>.Ok("", "Full name updated successfully");
-        }
-        catch (Exception ex)
-        {
-            return OperationResult<string>.Fail($"Error updating full name: {ex.Message}");
-        }
-    }
-
-    public async Task<OperationResult<string>> UpdateUserPasswordAsync(int userId, string newPassword)
-    {
-        try
-        {
-            var user = await _context.Users.FindAsync(userId);
-            if (user == null)
-                return OperationResult<string>.Fail("User not found");
+                return OperationResult<User>.Fail("User not found");
 
             user.PasswordHash = PasswordHelper.HashPassword(newPassword);
             await _context.SaveChangesAsync();
 
-            return OperationResult<string>.Ok("", "Password updated successfully");
+            return OperationResult<User>.Ok(user, "Password updated successfully");
         }
         catch (Exception ex)
         {
-            return OperationResult<string>.Fail($"Error updating password: {ex.Message}");
+            return OperationResult<User>.Fail($"Error updating password: {ex.Message}");
         }
     }
 
- 
-    public async Task<OperationResult<string>> LoginUserAsync(string email, string password)
+    public async Task<OperationResult<User>> UpdateUserFullNameAsync(int userId, string newFullName)
+    {
+        try
+        {
+            var user = await _context.Users.FindAsync(userId);
+            if (user == null)
+                return OperationResult<User>.Fail("User not found");
+
+            user.FullName = newFullName.Trim(); 
+            await _context.SaveChangesAsync();
+
+            return OperationResult<User>.Ok(user, "Fullname updated successfully");
+        }
+        catch (Exception ex)
+        {
+            return OperationResult<User>.Fail($"Error updating full name: {ex.Message}");
+        }
+    }
+    public async Task<OperationResult<object>> LoginUserAsync(string email, string password)
     {
         try
         {
@@ -149,19 +148,32 @@ public class UserService : IUserService
 
             var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
             if (user == null)
-                return OperationResult<string>.Fail("Email not found");
+                return OperationResult<object>.Fail("Email not found.");
 
             bool isPasswordCorrect = PasswordHelper.VerifyPassword(password, user.PasswordHash);
             if (!isPasswordCorrect)
-                return OperationResult<string>.Fail("Incorrect password");
+                return OperationResult<object>.Fail("Incorrect password.");
 
             string token = new JwtService(_configuration).GenerateToken(user);
 
-            return OperationResult<string>.Ok(token, "Login successful");
+            var userDto = new
+            {
+                user.Id,
+                user.FullName,
+                user.Email,
+            };
+
+            var response = new
+            {
+                token,
+                user = userDto
+            };
+
+            return OperationResult<object>.Ok(response, "Login successful.");
         }
         catch (Exception ex)
         {
-            return OperationResult<string>.Fail($"Error during login: {ex.Message}");
+            return OperationResult<object>.Fail($"Error during login: {ex.Message}");
         }
     }
 
@@ -169,23 +181,20 @@ public class UserService : IUserService
     {
         try
         {
-            var user = await _context.Users
-                .Include(u => u.Accounts)
-                .FirstOrDefaultAsync(u => u.Id == userId);
+            var accounts = await _context.Accounts
+                .Where(a => a.UserId == userId)
+                .ToListAsync();
 
-            if (user == null)
-                return OperationResult<List<Account>>.Fail("User ID not found.");
-
-            var accounts = user.Accounts.ToList();
-
-            if (accounts.Count == 0)
-                return OperationResult<List<Account>>.Fail("This user has no accounts.");
+            if (!accounts.Any())
+                return OperationResult<List<Account>>.Fail("No accounts found for this user.");
 
             return OperationResult<List<Account>>.Ok(accounts, "User accounts retrieved successfully.");
         }
-        catch (Exception ex) { return OperationResult<List<Account>>.Fail(ex.Message); }
+        catch (Exception ex)
+        {
+            return OperationResult<List<Account>>.Fail(ex.Message);
+        }
     }
-
     public async Task<OperationResult<decimal>> GetUserBalanceAsync(int userId)
     {
         var user = await _context.Users

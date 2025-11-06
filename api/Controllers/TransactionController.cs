@@ -29,7 +29,7 @@ public class TransactionController : ControllerBase
         return Ok(result.Message);
     }
 
-    [Authorize]
+  
     [HttpPost("deposit")]
     public async Task<IActionResult> DepositFunds([FromBody] AccountTransactionRequest request)
     {

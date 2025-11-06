@@ -82,5 +82,6 @@ public class AccountController : ControllerBase
         if (!result.Success) return BadRequest(result.Message);
         return Ok(result.Data);
     }
+    
 }
 

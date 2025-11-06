@@ -12,6 +12,9 @@ public class UserController : ControllerBase
         _userService = userService;
     }
 
+
+  
+
     [HttpPost("register_user")]
     public async Task<IActionResult> RegisterUser(string Fullname, string Email, string Password)
     {
@@ -23,7 +26,7 @@ public class UserController : ControllerBase
         return Ok(result.Message);
     }
 
-    [HttpDelete("delete_user")]
+    [HttpDelete("{userId}/delete_user")]
     public async Task<IActionResult> RemoveUser(int userId)
     {
         if (userId <= 0) return BadRequest("Valid userId is required.");
@@ -33,51 +36,51 @@ public class UserController : ControllerBase
         return Ok(result.Message);
     }
 
-    [HttpPatch("update_user_email")]
-    public async Task<IActionResult> UpdateUserEmail(int UserId, string NewEmail)
-    {
-        if (string.IsNullOrEmpty(NewEmail)) return BadRequest("NewEmail cannot be empty.");
+  
 
-        var result = await _userService.UpdateUserEmailAsync(UserId, NewEmail);
-        if (!result.Success) return BadRequest(result.Message);
-        return Ok(result.Message);
+    [HttpPatch("{userId}/email")]
+    public async Task<IActionResult> UpdateUserEmail(int userId, [FromBody] UpdateEmailRequest request)
+    {
+        if (string.IsNullOrEmpty(request.NewEmail))
+            return BadRequest("New email cannot be empty.");
+
+        var result = await _userService.UpdateUserEmailAsync(userId, request.NewEmail);
+        if (!result.Success) return BadRequest(result.Message); 
+        return Ok(result.Data);
     }
 
-    [HttpPatch("update_user_fullname")]
-    public async Task<IActionResult> UpdateUserFullname(int UserId, string NewFullname)
-    {
-        if (string.IsNullOrEmpty(NewFullname)) return BadRequest("NewFullname cannot be empty.");
+  
 
-        var result = await _userService.UpdateUserFullNameAsync(UserId, NewFullname);
+    [HttpPatch("{userId}/password")]
+    public async Task<IActionResult> UpdateUserPassword(int userId, [FromBody] UpdatePasswordRequest request)
+    {
+        if (string.IsNullOrEmpty(request.NewPassword)) return BadRequest("New password cannot be empty.");
+
+        var result = await _userService.UpdateUserPasswordAsync(userId, request.NewPassword);
         if (!result.Success) return BadRequest(result.Message);
-        return Ok(result.Message);
+        return Ok(result.Data);
     }
 
-    [HttpPatch("update_user_password")]
-    public async Task<IActionResult> UpdateUserPassword(int UserId, string NewPassword)
+    [HttpPatch("{userId}/fullname")]
+    public async Task<IActionResult> UpdateUserFullname(int userId, [FromBody] UpdateFullnameRequest request)
     {
-        if (string.IsNullOrEmpty(NewPassword)) return BadRequest("NewPassword cannot be empty.");
+        if (string.IsNullOrEmpty(request.NewFullname))
+            return BadRequest("New Fullname cannot be empty.");
 
-        var result = await _userService.UpdateUserPasswordAsync(UserId, NewPassword);
+        var result = await _userService.UpdateUserFullNameAsync(userId, request.NewFullname);
         if (!result.Success) return BadRequest(result.Message);
-        return Ok(result.Message);
+        return Ok(result.Data);
     }
-
     [HttpPost("login")]
     public async Task<IActionResult> Login([FromBody] LoginRequest request)
     {
-        if (string.IsNullOrEmpty(request.Email) || string.IsNullOrEmpty(request.Password))
-            return BadRequest("Email and Password are required.");
+        if (request.Email == null || request.Password == null) return BadRequest("Login fields cannot be empty.");
 
         var result = await _userService.LoginUserAsync(request.Email, request.Password);
         if (!result.Success) return BadRequest(result.Message);
-
-        return Ok(new
-        {
-            token = result.Data,
-            message = result.Message
-        });
+        return Ok(result.Data);
     }
+
 
     [Authorize]
     [HttpGet("{userId}/accounts")]

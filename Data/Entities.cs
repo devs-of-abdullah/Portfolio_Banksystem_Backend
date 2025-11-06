@@ -16,7 +16,7 @@ public class Account
     public string AccountNumber { get; set; } = string.Empty;
 
     public string AccountName {  get; set; } = string.Empty;
-    public decimal Balance { get; set; }
+    public decimal Balance { get; set; } 
     public DateTime CreatedAt { get; set; } = DateTime.UtcNow;
     public bool IsActive { get; set; } = true;
 
