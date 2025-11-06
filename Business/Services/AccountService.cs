@@ -42,6 +42,36 @@ public class AccountService :IAccountService{
 
     }
 
+    public async Task<OperationResult<bool>> RemoveAccountAsync(int userId, string accountNumber)
+    {
+        try
+        {
+            if (string.IsNullOrWhiteSpace(accountNumber))
+                return OperationResult<bool>.Fail("Account number is required.");
+
+            var account = await _context.Accounts
+                .FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
+
+            if (account == null)
+                return OperationResult<bool>.Fail("Account number does not exist.");
+
+            if (account.UserId == userId)
+            {
+                _context.Accounts.Remove(account);
+                await _context.SaveChangesAsync();
+                return OperationResult<bool>.Ok(true, "Account deleted successfully.");
+            }
+            else
+            {
+                return OperationResult<bool>.Fail("You don’t have access to delete this account.");
+            }
+        }
+        catch (Exception ex)
+        {
+            return OperationResult<bool>.Fail($"Error: {ex.Message}");
+        }
+    }
+
     public async Task<OperationResult<string>> UpdateAccountNameAsync(int accountId, string newName)
     {
         try

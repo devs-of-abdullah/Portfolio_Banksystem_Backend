@@ -82,7 +82,6 @@ public class UserController : ControllerBase
     }
 
 
-    [Authorize]
     [HttpGet("{userId}/accounts")]
     public async Task<IActionResult> GetUserAccounts(int userId)
     {
@@ -91,7 +90,6 @@ public class UserController : ControllerBase
         return Ok(result.Data);
     }
 
-    [Authorize]
     [HttpGet("{userId}/balance")]
     public async Task<IActionResult> GetUserBalance(int userId)
     {

@@ -157,19 +157,15 @@ public class UserService : IUserService
             string token = new JwtService(_configuration).GenerateToken(user);
 
             var userDto = new
-            {
+            {   token,
                 user.Id,
                 user.FullName,
                 user.Email,
             };
 
-            var response = new
-            {
-                token,
-                user = userDto
-            };
+           
 
-            return OperationResult<object>.Ok(response, "Login successful.");
+            return OperationResult<object>.Ok(userDto, "Login successful.");
         }
         catch (Exception ex)
         {

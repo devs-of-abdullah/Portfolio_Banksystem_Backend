@@ -10,6 +10,7 @@
         Task<OperationResult<string>> DeActivateAllAccountsAsync(int accountId);
         Task<OperationResult<List<Account>>> GetAllUserAccountsAsync(int userId);
         Task<OperationResult<decimal>> GetAccountBalanceAsync(string accountNumber);
+        Task<OperationResult<bool>> RemoveAccountAsync(int userId,string accountNumber);
 
     }
 
