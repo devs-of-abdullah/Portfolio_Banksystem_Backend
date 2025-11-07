@@ -12,7 +12,7 @@ public class TransactionController : ControllerBase
         _transactionService = transactionService;
     }
 
-    [Authorize]
+   
     [HttpPost("transfer")]
     public async Task<IActionResult> TransferFunds([FromBody] FundTransferRequest request)
     {
@@ -26,7 +26,7 @@ public class TransactionController : ControllerBase
         );
 
         if (!result.Success) return BadRequest(result.Message);
-        return Ok(result.Message);
+        return Ok(result.Data);
     }
 
   
@@ -41,7 +41,6 @@ public class TransactionController : ControllerBase
         return Ok(result.Message);
     }
 
-    [Authorize]
     [HttpPost("withdraw")]
     public async Task<IActionResult> WithdrawFunds([FromBody] AccountTransactionRequest request)
     {
