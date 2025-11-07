@@ -61,8 +61,7 @@ public class TransactionService : ITransactionService
             if (amount <= 0)
                 return OperationResult<bool>.Fail("Amount must be greater than 0.");
 
-            if (amount > 3000)
-                return OperationResult<bool>.Fail("Amount must be smaller than or equal to 3000.");
+           
 
             account.Balance += amount;
 
