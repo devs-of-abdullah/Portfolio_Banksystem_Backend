@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
 using System.Text.Json.Serialization;
@@ -14,15 +13,14 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 if (string.IsNullOrWhiteSpace(connectionString))
 {
-    connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection")
-                       ?? Environment.GetEnvironmentVariable("BANK_DB_CONNECTION");
+    connectionString = Environment.GetEnvironmentVariable("ConnectionStrings__DefaultConnection") ?? Environment.GetEnvironmentVariable("BANK_DB_CONNECTION");
 }
 
 if (string.IsNullOrWhiteSpace(connectionString))
-    throw new InvalidOperationException("Database connection string is not configured. Set ConnectionStrings:DefaultConnection in appsettings.json or the env var ConnectionStrings__DefaultConnection or BANK_DB_CONNECTION.");
+    throw new InvalidOperationException("Database connection string is not configured. Set ConnectionStrings:DefaultConnection in appsettings.json or the env var BANK_DB_CONNECTION.");
 
 builder.Services.AddDbContext<AppContext>(options =>
-    options.UseNpgsql(connectionString));
+    options.UseSqlServer(connectionString));
 
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IAccountService, AccountService>();

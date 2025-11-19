@@ -4,9 +4,9 @@ public class AppContext : DbContext
 {
     public AppContext(DbContextOptions<AppContext> options) : base(options) { }
 
-    public DbSet<User> Users { get; set; } = null!;
-    public DbSet<Account> Accounts { get; set; } = null!;
-    public DbSet<Transaction> Transactions { get; set; } = null!;
+    public DbSet<User> users { get; set; } = null!;
+    public DbSet<Account> accounts { get; set; } = null!;
+    public DbSet<Transaction> transactions { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

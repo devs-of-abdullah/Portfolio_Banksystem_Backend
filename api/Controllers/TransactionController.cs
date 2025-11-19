@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("[controller]")] 
+[Route("[controller]")]
+[Authorize]
 public class TransactionController : ControllerBase
 {
     private readonly ITransactionService _transactionService;

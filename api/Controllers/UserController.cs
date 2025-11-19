@@ -2,7 +2,8 @@
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("[controller]")]  
+[Route("[controller]")]
+
 public class UserController : ControllerBase
 {
     private readonly IUserService _userService;
@@ -11,9 +12,6 @@ public class UserController : ControllerBase
     {
         _userService = userService;
     }
-
-
-  
 
     [HttpPost("register_user")]
     public async Task<IActionResult> RegisterUser(string Fullname, string Email, string Password)

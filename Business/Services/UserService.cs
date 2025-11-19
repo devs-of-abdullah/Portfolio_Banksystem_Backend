@@ -19,7 +19,7 @@ public class UserService : IUserService
         {
             email = email.Trim().ToLower();
 
-            if (await _context.Users.AnyAsync(u => u.Email == email))
+            if (await _context.users.AnyAsync(u => u.Email == email))
                 return OperationResult<User>.Fail($"{email} already exists");
 
             var user = new User
@@ -29,7 +29,7 @@ public class UserService : IUserService
                 PasswordHash = PasswordHelper.HashPassword(password)
             };
 
-            _context.Users.Add(user);
+            _context.users.Add(user);
             await _context.SaveChangesAsync();
 
             return OperationResult<User>.Ok(user, "User created successfully");
@@ -45,11 +45,11 @@ public class UserService : IUserService
     {
         try
         {
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.users.FindAsync(userId);
             if (user == null)
                 return OperationResult<string>.Fail("User not found");
 
-            _context.Users.Remove(user);
+            _context.users.Remove(user);
             await _context.SaveChangesAsync();
 
             return OperationResult<string>.Ok("", "User deleted successfully");
@@ -66,12 +66,12 @@ public class UserService : IUserService
         try
         {
             newEmail = newEmail.Trim().ToLower();
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.users.FindAsync(userId);
 
             if (user == null)
                 return OperationResult<User>.Fail("User not found");
 
-            bool emailExists = await _context.Users.AnyAsync(u => u.Email == newEmail && u.Id != user.Id);
+            bool emailExists = await _context.users.AnyAsync(u => u.Email == newEmail && u.Id != user.Id);
             if (emailExists)
                 return OperationResult<User>.Fail($"Email '{newEmail}' already exists");
 
@@ -90,7 +90,7 @@ public class UserService : IUserService
         try
         {
           string formatedEmail = email.Trim().ToLower();
-           var user =await _context.Users.FirstOrDefaultAsync(u => u.Email == formatedEmail);
+           var user =await _context.users.FirstOrDefaultAsync(u => u.Email == formatedEmail);
             if(user == null)
                 return OperationResult<int>.Fail("User not found");
             return OperationResult<int>.Ok(user.Id, "id found");
@@ -107,7 +107,7 @@ public class UserService : IUserService
     {
         try
         {
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.users.FindAsync(userId);
             if (user == null)
                 return OperationResult<User>.Fail("User not found");
 
@@ -126,7 +126,7 @@ public class UserService : IUserService
     {
         try
         {
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.users.FindAsync(userId);
             if (user == null)
                 return OperationResult<User>.Fail("User not found");
 
@@ -146,7 +146,7 @@ public class UserService : IUserService
         {
             email = email.Trim().ToLower();
 
-            var user = await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
+            var user = await _context.users.FirstOrDefaultAsync(u => u.Email == email);
             if (user == null)
                 return OperationResult<object>.Fail("Email not found.");
 
@@ -177,7 +177,7 @@ public class UserService : IUserService
     {
         try
         {
-            var accounts = await _context.Accounts
+            var accounts = await _context.accounts
                 .Where(a => a.UserId == userId)
                 .ToListAsync();
 
@@ -193,7 +193,7 @@ public class UserService : IUserService
     }
     public async Task<OperationResult<decimal>> GetUserBalanceAsync(int userId)
     {
-        var user = await _context.Users
+        var user = await _context.users
             .Include(u => u.Accounts)
             .FirstOrDefaultAsync(u => u.Id == userId);
 

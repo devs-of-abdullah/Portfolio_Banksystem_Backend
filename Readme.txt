@@ -26,4 +26,3 @@ dotnet ef database update --project Data --startup-project api
 
 to drop all database 
 dotnet ef database drop --project Data --startup-project api
-dotnet ef database update --project Data --startup-project api

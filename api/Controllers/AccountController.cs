@@ -1,8 +1,9 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using System.Threading.Tasks;
+﻿using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
-[Route("[controller]")] 
+[Route("[controller]")]
+[Authorize]
 public class AccountController : ControllerBase
 {
     private readonly IAccountService _accountService;
@@ -23,10 +24,6 @@ public class AccountController : ControllerBase
         if (!result.Success) return BadRequest($"Something went wrong: {result.Message}");
         return Ok(result.Message);
     }
-
-   
-
-    
 
   
     [HttpGet("{userId}/user_accounts")]

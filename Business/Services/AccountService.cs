@@ -13,11 +13,11 @@ public class AccountService :IAccountService{
             if (string.IsNullOrWhiteSpace(name))
                 return OperationResult<Account>.Fail("Account name is required.");
 
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.users.FindAsync(userId);
             if (user == null)
                 return OperationResult<Account>.Fail($"User with ID {userId} does not exist.");
 
-            bool exists = await _context.Accounts
+            bool exists = await _context.accounts
                 .AnyAsync(a => a.UserId == userId && a.AccountName.ToLower() == name.ToLower() && a.IsActive);
 
             if (exists)
@@ -33,7 +33,7 @@ public class AccountService :IAccountService{
                 IsActive = true
             };
 
-            _context.Accounts.Add(account);
+            _context.accounts.Add(account);
             await _context.SaveChangesAsync();
 
             return OperationResult<Account>.Ok(account, "Account added successfully.");
@@ -49,7 +49,7 @@ public class AccountService :IAccountService{
             if (string.IsNullOrWhiteSpace(accountNumber))
                 return OperationResult<bool>.Fail("Account number is required.");
 
-            var account = await _context.Accounts
+            var account = await _context.accounts
                 .FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
 
             if (account == null)
@@ -57,7 +57,7 @@ public class AccountService :IAccountService{
 
             if (account.UserId == userId)
             {
-                _context.Accounts.Remove(account);
+                _context.accounts.Remove(account);
                 await _context.SaveChangesAsync();
                 return OperationResult<bool>.Ok(true, "Account deleted successfully.");
             }
@@ -78,11 +78,11 @@ public class AccountService :IAccountService{
         {
             if (string.IsNullOrEmpty(newName)) return OperationResult<string>.Fail("Name field is required");
 
-            var account = await _context.Accounts.FindAsync(accountId);
+            var account = await _context.accounts.FindAsync(accountId);
 
             if (account == null) return OperationResult<string>.Fail("Account id does not exist");
 
-            var duplicate = await _context.Accounts.AnyAsync(a => a.UserId == account.UserId && a.AccountName == newName && a.Id != accountId && a.IsActive);
+            var duplicate = await _context.accounts.AnyAsync(a => a.UserId == account.UserId && a.AccountName == newName && a.Id != accountId && a.IsActive);
             if (duplicate)
                 return OperationResult<string>.Fail("This account name already exists for this user.");
 
@@ -98,7 +98,7 @@ public class AccountService :IAccountService{
     {
         try
         {
-             var account = await _context.Accounts.FindAsync(accountId);
+             var account = await _context.accounts.FindAsync(accountId);
                     if(account == null ) return OperationResult<Account>.Fail($"Account {accountId} does not exist");
 
                     return OperationResult<Account>.Ok(account, "Account details");
@@ -112,7 +112,7 @@ public class AccountService :IAccountService{
     {
         try
         {
-           var account = await _context.Accounts.FindAsync(accountId);
+           var account = await _context.accounts.FindAsync(accountId);
                 if (account == null) return OperationResult<string>.Fail($"Account {accountId} does not exist");
 
                 if (account.IsActive)
@@ -132,7 +132,7 @@ public class AccountService :IAccountService{
     {
         try
         {
-         var account = await _context.Accounts.FindAsync(accountId);
+         var account = await _context.accounts.FindAsync(accountId);
                 if (account == null) return OperationResult<string>.Fail($"Account {accountId} does not exist");
 
                 if (!account.IsActive)
@@ -151,11 +151,11 @@ public class AccountService :IAccountService{
     public async Task<OperationResult<string>> ActivateAllAccountsAsync(int userId)
     {
         try {      
-        var user = await _context.Users.FindAsync(userId);
+        var user = await _context.users.FindAsync(userId);
         if (user == null)
             return OperationResult<string>.Fail("User not found");
 
-        var accounts = await _context.Accounts
+        var accounts = await _context.accounts
             .Where(a => a.UserId == userId && !a.IsActive)
             .ToListAsync();
 
@@ -180,11 +180,11 @@ public class AccountService :IAccountService{
     {
         try
         {
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.users.FindAsync(userId);
             if (user == null)
                 return OperationResult<string>.Fail("User not found");
 
-            var accounts = await _context.Accounts
+            var accounts = await _context.accounts
                 .Where(a => a.UserId == userId && a.IsActive)
                 .ToListAsync();
 
@@ -208,11 +208,11 @@ public class AccountService :IAccountService{
     {
         try
         {
-            var user = await _context.Users.FindAsync(userId);
+            var user = await _context.users.FindAsync(userId);
             if (user == null)
                 return OperationResult<List<Account>>.Fail("User not found");
 
-            var accounts = await _context.Accounts
+            var accounts = await _context.accounts
                 .Where(a => a.UserId == userId && a.IsActive)
                 .ToListAsync();
             return OperationResult<List<Account>>.Ok(accounts, "Accounts");
@@ -226,7 +226,7 @@ public class AccountService :IAccountService{
     {
         try
         {
-            var account = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
+            var account = await _context.accounts.FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
 
             if (account == null) return OperationResult<decimal>.Fail("Account not found");
 

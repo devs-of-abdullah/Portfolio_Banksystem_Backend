@@ -16,8 +16,8 @@ public class TransactionService : ITransactionService
         using var transaction = await _context.Database.BeginTransactionAsync();
         try
         {
-            var senderAccount = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountNumber == senderAccountNumber);
-            var receiverAccount = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountNumber == receiverAccountNumber);
+            var senderAccount = await _context.accounts.FirstOrDefaultAsync(a => a.AccountNumber == senderAccountNumber);
+            var receiverAccount = await _context.accounts.FirstOrDefaultAsync(a => a.AccountNumber == receiverAccountNumber);
 
             if (senderAccount == null || receiverAccount == null)
                 return OperationResult<bool>.Fail("Reciever account was not found.");
@@ -34,7 +34,7 @@ public class TransactionService : ITransactionService
             var senderTransaction = new Transaction { Type = "Send", AccountId = senderAccount.Id, Amount = amount };
             var receiverTransaction = new Transaction { Type = "Receive", AccountId = receiverAccount.Id, Amount = amount };
 
-            await _context.Transactions.AddRangeAsync(senderTransaction, receiverTransaction);
+            await _context.transactions.AddRangeAsync(senderTransaction, receiverTransaction);
 
             await _context.SaveChangesAsync();
 
@@ -53,7 +53,7 @@ public class TransactionService : ITransactionService
     {
         try
         {
-            var account = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
+            var account = await _context.accounts.FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
 
             if (account == null)
                 return OperationResult<bool>.Fail("Incorrect account number.");
@@ -72,7 +72,7 @@ public class TransactionService : ITransactionService
                 Type = "Deposit",
             };
 
-            await _context.Transactions.AddAsync(transaction);
+            await _context.transactions.AddAsync(transaction);
             await _context.SaveChangesAsync();
 
             return OperationResult<bool>.Ok(true, $"{amount} deposited to account {accountNumber}");
@@ -87,7 +87,7 @@ public class TransactionService : ITransactionService
     {
         try
         {
-            var account = await _context.Accounts.FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
+            var account = await _context.accounts.FirstOrDefaultAsync(a => a.AccountNumber == accountNumber);
 
             if (account == null)
                 return OperationResult<bool>.Fail("Incorrect account number.");
@@ -107,7 +107,7 @@ public class TransactionService : ITransactionService
                 Type = "Withdraw",
             };
 
-            await _context.Transactions.AddAsync(transaction);
+            await _context.transactions.AddAsync(transaction);
             await _context.SaveChangesAsync();
 
             return OperationResult<bool>.Ok(true, $"{amount} withdrawn from account {accountNumber}");
